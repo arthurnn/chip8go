@@ -21,3 +21,8 @@ func (cpu *CPU) PushToStack(pc uint16) {
 
 	// TODO check stack > 15
 }
+
+func (cpu *CPU) PopFromStack() uint16 {
+	cpu.sp -= 1
+	return cpu.stack[cpu.sp]
+}
