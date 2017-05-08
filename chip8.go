@@ -38,9 +38,22 @@ func (emulator *Chip8) Cycle() {
 	//fmt.Printf("PC IS %x\n", emulator.PC)
 	opcode := emulator.peekNextOp()
 	if 0x1000 == (opcode & 0xF000) {
-		// 1NNN	Flow	goto NNN;	Jumps to address NNN.
+		// 1NNN
+		// Flow
+		// goto NNN;
+		// Jumps to address NNN.
 		emulator.cpu.PC = opcode & 0x0FFF
-		return
+		goto END
+	}
+
+	if 0x2000 == (opcode & 0xF000) {
+		// 2NNN
+		// Flow
+		// *(0xNNN)()
+		// Calls subroutine at NNN.
+		emulator.cpu.PushToStack(emulator.cpu.PC)
+		emulator.cpu.PC = opcode & 0x0FFF
+		goto END
 	}
 
 	switch opcode & 0xF000 {
@@ -98,7 +111,7 @@ func (emulator *Chip8) Cycle() {
 	}
 
 	emulator.cpu.PC += 2
-
+END:
 	if emulator.cpu.DTimer > 0 {
 		emulator.cpu.DTimer -= 1
 	}

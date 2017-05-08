@@ -14,3 +14,10 @@ type CPU struct {
 	DTimer byte
 	STime  byte
 }
+
+func (cpu *CPU) PushToStack(pc uint16) {
+	cpu.stack[cpu.sp] = pc
+	cpu.sp += 1
+
+	// TODO check stack > 15
+}

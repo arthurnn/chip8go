@@ -13,7 +13,7 @@ func main() {
 	emulator := chip8.NewChip8()
 
 	// load game
-	rom, err := ioutil.ReadFile("../roms/zero")
+	rom, err := ioutil.ReadFile("../roms/ibm")
 	if err != nil {
 		log.Fatal(err)
 	}
