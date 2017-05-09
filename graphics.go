@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
+type Sprit struct {
+	x, y byte
+	height uint16
+}
+
 type Graphics struct {
 	drawFlag bool
 	gfx      [64][32]bool
@@ -48,4 +53,9 @@ func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 	}
 
 	return
+}
+
+
+func (g *Graphics) ClearDisplay() {
+
 }

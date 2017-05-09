@@ -21,7 +21,7 @@ func main() {
 	emulator.LoadRom(rom)
 
 	for {
-		emulator.Cycle()
+		emulator.Run()
 
 		emulator.Output.Render()
 
