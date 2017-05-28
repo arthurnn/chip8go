@@ -35,7 +35,7 @@ func (cpu *CPU) popFromStack() uint16 {
 	return cpu.stack[cpu.sp]
 }
 
-func (cpu *CPU) Cycle(opcode uint16) {
+func (cpu *CPU) Cycle(opcode uint16, mem *Memory) {
 	cpu.DrawSprit = nil
 	cpu.ClearDisplay = false
 

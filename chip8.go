@@ -57,7 +57,7 @@ func (emulator *Chip8) peekNextOp() uint16 {
 func (emulator *Chip8) Run() {
 	//fmt.Printf("PC IS %x\n", emulator.PC)
 	opcode := emulator.peekNextOp()
-	emulator.cpu.Cycle(opcode)
+	emulator.cpu.Cycle(opcode, &emulator.Memory)
 	if emulator.cpu.ClearDisplay {
 		emulator.Output.ClearDisplay()
 	}
