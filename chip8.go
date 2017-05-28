@@ -67,8 +67,8 @@ func (emulator *Chip8) Run() {
 
 		emulator.Output.SetPixel(emulator.cpu.DrawSprit.x, emulator.cpu.DrawSprit.y, mem)
 
-//		if col {
-			// V[0xF] = 1
+		//		if col {
+		// V[0xF] = 1
 		//}
 	}
 }

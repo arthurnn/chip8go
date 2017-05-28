@@ -139,13 +139,13 @@ func (cpu *CPU) Cycle(opcode uint16, mem *Memory) {
 			mem[cpu.I+2] = byte(vx % 10)
 		case 0x55:
 			// FX55	MEM	reg_dump(Vx,&I)	Stores V0 to VX (including VX) in memory starting at address I.
-			for i := uint16(0) ; i <= x; i += 1 {
-				mem[cpu.I + i] = cpu.V[i]
+			for i := uint16(0); i <= x; i += 1 {
+				mem[cpu.I+i] = cpu.V[i]
 			}
 		case 0x65:
 			// FX65	MEM	reg_load(Vx,&I)	Fills V0 to VX (including VX) with values from memory starting at address I.
-			for i := uint16(0) ; i <= x; i += 1 {
-				cpu.V[i] = mem[cpu.I + i]
+			for i := uint16(0); i <= x; i += 1 {
+				cpu.V[i] = mem[cpu.I+i]
 			}
 		default:
 			fmt.Printf("%x\n", opcode)
