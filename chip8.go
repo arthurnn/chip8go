@@ -9,7 +9,7 @@ type Chip8 struct {
 
 	//	TODO keyboard input
 
-	Output Graphics
+	Output *Graphics
 }
 
 var defaultsprite = []byte{
@@ -37,7 +37,8 @@ func NewChip8() *Chip8 {
 	}
 
 	e := &Chip8{
-		cpu: cpu,
+		cpu:    cpu,
+		Output: NewTermboxGraphics(),
 	}
 
 	// Load default sprites
@@ -62,13 +63,14 @@ func (emulator *Chip8) Run() {
 		emulator.Output.ClearDisplay()
 	}
 
-	if emulator.cpu.DrawSprit != nil {
-		mem := emulator.Memory[emulator.cpu.I : emulator.cpu.I+emulator.cpu.DrawSprit.height]
+	if emulator.cpu.DrawSprite != nil {
+		mem := emulator.Memory[emulator.cpu.I : emulator.cpu.I+emulator.cpu.DrawSprite.height]
 
-		emulator.Output.SetPixel(emulator.cpu.DrawSprit.x, emulator.cpu.DrawSprit.y, mem)
-
-		//		if col {
-		// V[0xF] = 1
-		//}
+		col := emulator.Output.SetPixel(emulator.cpu.DrawSprite.x, emulator.cpu.DrawSprite.y, mem)
+		if col {
+			emulator.cpu.V[0xF] = 0x01
+		} else {
+			emulator.cpu.V[0xF] = 0x00
+		}
 	}
 }

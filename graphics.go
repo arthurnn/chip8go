@@ -1,11 +1,13 @@
 package chip8
 
 import (
-	"fmt"
+	//	"fmt"
+
+	"github.com/nsf/termbox-go"
 )
 
-type Sprit struct {
-	x, y byte
+type Sprite struct {
+	x, y   byte
 	height uint16
 }
 
@@ -14,38 +16,62 @@ type Graphics struct {
 	gfx      [64][32]bool
 }
 
+func termboxInit(bg termbox.Attribute) error {
+	if err := termbox.Init(); err != nil {
+		return err
+	}
+
+	termbox.HideCursor()
+
+	if err := termbox.Clear(bg, bg); err != nil {
+		return err
+	}
+
+	return termbox.Flush()
+}
+
+func NewTermboxGraphics() *Graphics {
+	termboxInit(termbox.ColorDefault)
+	return &Graphics{}
+}
+
 func (g *Graphics) Render() {
 	if g.drawFlag {
-		// draw here
-		//fmt.Println("drawing...")
 		g.drawFlag = false
 
 		for y := 0; y < 32; y++ {
 			for x := 0; x < 64; x++ {
+				var v rune;
 				if g.gfx[x][y] {
-					fmt.Printf("*")
+					v = '*'
 				} else {
-					fmt.Printf(" ")
+					v = ' '
 				}
+				termbox.SetCell(x, y, v, termbox.ColorDefault, termbox.ColorDefault)
 			}
-			fmt.Printf("\n")
 		}
+
+		termbox.Flush()
 	}
 }
 func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 	g.drawFlag = true
 
+	width, height := uint(8), uint(len(memory))
+
 	//fmt.Printf("set pixel size %x\n", memory)
-	var rx, ry int
-	for ry = 0; ry < len(memory); ry++ {
+	for ry := uint(0); ry < height; ry++ {
 		pixel := memory[ry]
-		for rx = 0; rx < 8; rx++ {
-			p := 0x80 >> uint(rx)
+		for rx := uint(0); rx < width; rx++ {
+			p := 128 >> rx // 128 == 10000000 (binary)
 			if (pixel & byte(p)) > 0 {
-				if g.gfx[int(x)+rx][int(y)+ry] {
-					g.gfx[int(x)+rx][int(y)+ry] = false
+				gx := byte(rx) + x
+				gy := byte(ry) + y
+				if g.gfx[gx][gy] {
+					g.gfx[gx][gy] = false
+					collision = true
 				} else {
-					g.gfx[int(x)+rx][int(y)+ry] = true
+					g.gfx[gx][gy] = true
 				}
 
 			}
@@ -55,7 +81,10 @@ func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 	return
 }
 
-
 func (g *Graphics) ClearDisplay() {
+	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+}
 
+func (g *Graphics) Close() {
+	termbox.Close()
 }
