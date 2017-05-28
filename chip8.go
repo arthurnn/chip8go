@@ -1,9 +1,11 @@
 package chip8
 
+type Memory [4096]byte
+
 type Chip8 struct {
 	cpu CPU
 
-	Memory [4096]byte
+	Memory Memory
 
 	//	TODO keyboard input
 
