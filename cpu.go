@@ -11,7 +11,7 @@ type CPU struct {
 	I  uint16
 
 	// Drawing
-	DrawSprit *Sprit
+	DrawSprit    *Sprit
 	ClearDisplay bool
 
 	// stack
@@ -123,11 +123,30 @@ func (cpu *CPU) Cycle(opcode uint16, mem *Memory) {
 		//mem := emulator.Memory[cpu.I : cpu.I+height]
 		//emulator.Output.SetPixel(x, y, mem)
 	case 0xF000:
+		x := (opcode & 0x0F00) >> 8
+
 		switch opcode & 0x00FF {
 		case 0x15:
 			// FX07	Timer	Vx = get_delay()	Sets VX to the value of the delay timer.
-			x := (opcode & 0x0F00) >> 8
 			cpu.DTimer = cpu.V[x]
+		case 0x29:
+			// FX29	MEM	I=sprite_addr[Vx]	Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font
+			cpu.I = uint16(cpu.V[x]) * uint16(5)
+		case 0x33:
+			vx := cpu.V[x]
+			mem[cpu.I] = byte(vx / 100)
+			mem[cpu.I+1] = byte((vx / 10) % 10)
+			mem[cpu.I+2] = byte(vx % 10)
+		case 0x55:
+			// FX55	MEM	reg_dump(Vx,&I)	Stores V0 to VX (including VX) in memory starting at address I.
+			for i := uint16(0) ; i <= x; i += 1 {
+				mem[cpu.I + i] = cpu.V[i]
+			}
+		case 0x65:
+			// FX65	MEM	reg_load(Vx,&I)	Fills V0 to VX (including VX) with values from memory starting at address I.
+			for i := uint16(0) ; i <= x; i += 1 {
+				cpu.V[i] = mem[cpu.I + i]
+			}
 		default:
 			fmt.Printf("%x\n", opcode)
 		}
