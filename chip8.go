@@ -38,7 +38,7 @@ func NewChip8() *Chip8 {
 
 	e := &Chip8{
 		cpu:    cpu,
-		Output: NewTermboxGraphics(),
+		Output: NewNullDisplay(),
 	}
 
 	// Load default sprites
@@ -59,6 +59,7 @@ func (emulator *Chip8) Run() {
 	//fmt.Printf("PC IS %x\n", emulator.PC)
 	opcode := emulator.peekNextOp()
 	emulator.cpu.Cycle(opcode, &emulator.Memory)
+
 	if emulator.cpu.ClearDisplay {
 		emulator.Output.ClearDisplay()
 	}

@@ -1,7 +1,7 @@
 package chip8
 
 import (
-	//	"fmt"
+//	"fmt"
 
 	"github.com/nsf/termbox-go"
 )
@@ -13,7 +13,13 @@ type Sprite struct {
 
 type Graphics struct {
 	drawFlag bool
-	gfx      [64][32]bool
+	gfx      [65][33]bool
+
+	display Display
+}
+
+type Display interface {
+	Render(g *Graphics)
 }
 
 func termboxInit(bg termbox.Attribute) error {
@@ -30,30 +36,47 @@ func termboxInit(bg termbox.Attribute) error {
 	return termbox.Flush()
 }
 
-func NewTermboxGraphics() *Graphics {
+func NewTermboxDisplay() *Graphics {
 	termboxInit(termbox.ColorDefault)
-	return &Graphics{}
+	return &Graphics{display: TermboxDisplay{}}
+}
+
+func NewNullDisplay() *Graphics {
+	return &Graphics{display: NullDisplay{}}
+}
+
+type NullDisplay struct{}
+
+func (n NullDisplay) Render(g *Graphics) {
+	// empty
+}
+
+type TermboxDisplay struct{}
+
+func (t TermboxDisplay) Render(g *Graphics) {
+	for y := 0; y < 32; y++ {
+		for x := 0; x < 64; x++ {
+			var v rune
+			if g.gfx[x][y] {
+				v = '*'
+			} else {
+				v = ' '
+			}
+			termbox.SetCell(x, y, v, termbox.ColorDefault, termbox.ColorDefault)
+		}
+	}
+
+	termbox.Flush()
+
 }
 
 func (g *Graphics) Render() {
 	if g.drawFlag {
 		g.drawFlag = false
-
-		for y := 0; y < 32; y++ {
-			for x := 0; x < 64; x++ {
-				var v rune;
-				if g.gfx[x][y] {
-					v = '*'
-				} else {
-					v = ' '
-				}
-				termbox.SetCell(x, y, v, termbox.ColorDefault, termbox.ColorDefault)
-			}
-		}
-
-		termbox.Flush()
+		g.display.Render(g)
 	}
 }
+
 func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 	g.drawFlag = true
 
@@ -67,6 +90,8 @@ func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 			if (pixel & byte(p)) > 0 {
 				gx := byte(rx) + x
 				gy := byte(ry) + y
+				//fmt.Printf("Set Pixel [%d,%d]\n", gx, gy)
+
 				if g.gfx[gx][gy] {
 					g.gfx[gx][gy] = false
 					collision = true
@@ -82,7 +107,8 @@ func (g *Graphics) SetPixel(x, y byte, memory []byte) (collision bool) {
 }
 
 func (g *Graphics) ClearDisplay() {
-	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	//termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
+	panic("clear")
 }
 
 func (g *Graphics) Close() {

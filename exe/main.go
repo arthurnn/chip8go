@@ -3,11 +3,11 @@ package main
 import (
 	"io/ioutil"
 	"log"
-	"time"
 	"os"
 	"os/signal"
 	"syscall"
-//	"fmt"
+	"time"
+	//	"fmt"
 	"github.com/arthurnn/chip8"
 	"github.com/nsf/termbox-go"
 )
@@ -15,7 +15,9 @@ import (
 func main() {
 
 	emulator := chip8.NewChip8()
-	defer emulator.Output.Close()
+
+	//emulator.Output = chip8.NewTermboxDisplay()
+	//defer emulator.Output.Close()
 
 	// load game
 	rom, err := ioutil.ReadFile("../roms/TETRIS")
@@ -44,9 +46,9 @@ func main() {
 loop:
 	for {
 		select {
-		case <- stop:
+		case <-stop:
 			break loop
-		case <- clock:
+		case <-clock:
 			emulator.Run()
 			emulator.Output.Render()
 		}

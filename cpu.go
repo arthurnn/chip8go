@@ -84,19 +84,19 @@ func (cpu *CPU) Cycle(opcode uint16, mem *Memory) {
 	case 0x3000:
 		// 3XNN	Cond	if(Vx==NN)	Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block)
 		x := (opcode & 0x0F00) >> 8
-		if x == (opcode & 0x00FF) {
+		if cpu.V[x] == byte(opcode) {
 			cpu.PC += 2
 		}
 	case 0x4000:
 		// 4XNN	Cond	if(Vx!=NN)	Skips the next instruction if VX doesn't equal NN. (Usually the next instruction is a jump to skip a code block)
 		x := (opcode & 0x0F00) >> 8
-		if x != (opcode & 0x00FF) {
+		if cpu.V[x] != byte(opcode) {
 			cpu.PC += 2
 		}
 	case 0x6000:
 		// 6XNN	Const	Vx = NN	Sets VX to NN.
-		v := (opcode & 0x0F00) >> 8
-		cpu.V[v] = byte(opcode)
+		x := (opcode & 0x0F00) >> 8
+		cpu.V[x] = byte(opcode)
 	case 0x7000:
 		// 7XNN	Const	Vx += NN	Adds NN to VX.
 		v := (opcode & 0x0F00) >> 8
@@ -169,6 +169,9 @@ func (cpu *CPU) Cycle(opcode uint16, mem *Memory) {
 			for i := uint16(0); i <= x; i += 1 {
 				cpu.V[i] = mem[cpu.I+i]
 			}
+		case 0x1E:
+			// FX1E	MEM	I +=Vx	Adds VX to I.
+			cpu.V[cpu.I] += cpu.V[x]
 		default:
 			panic(fmt.Sprintf("Not found instruction %x\n", opcode))
 		}
